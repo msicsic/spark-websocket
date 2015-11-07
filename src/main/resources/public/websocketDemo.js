@@ -9,7 +9,7 @@ document.getElementById("message").addEventListener("keypress", function(e) {
 });
 
 (function() {
-    webSocket = new WebSocket("ws://"+location.hostname+":"+location.port+"/randomGeneratedFeed/");
+    webSocket = new WebSocket("ws://"+location.hostname+":"+location.port+"/chat/");
     webSocket.onopen    = function()    { addMsgToFeed("Connected");    };
     webSocket.onmessage = function(msg) { addMsgToFeed(msg);            };
     webSocket.onclose   = function()    { addMsgToFeed("Disconnected"); };
