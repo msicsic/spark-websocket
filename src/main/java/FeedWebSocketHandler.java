@@ -10,12 +10,13 @@ public class FeedWebSocketHandler {
     public void onConnect(Session session) throws Exception {
         System.out.println(session.getRemoteAddress().toString() + " connected");
         this.session = session;
-        Main.wsSessions.add(this.session);
+        Main.feedSessions.add(this.session);
     }
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
-        Main.wsSessions.remove(this.session);
+        System.out.println(session.getRemoteAddress().toString() + " disconnected");
+        Main.feedSessions.remove(this.session);
         this.session = null;
     }
 
