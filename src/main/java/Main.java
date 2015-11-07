@@ -1,18 +1,16 @@
 import org.eclipse.jetty.websocket.api.*;
 import java.io.*;
-import java.text.*;
 import java.util.*;
 import static j2html.TagCreator.*;
 import static spark.Spark.*;
 
 public class Main {
 
-    static Timer feedTimer;
-    static List<Session> feedSessions;
+    static Timer feedTimer = new Timer();
+    static List<Session> feedSessions = new ArrayList<>();
+    static int numberOfMessagesSent = 0;
 
     public static void main(String[] args) {
-        feedTimer = new Timer();
-        feedSessions = new ArrayList<>();
         setTimerSpeed(2500);
         staticFileLocation("public"); // index.html will be served at localhost:4567/
         port(9999);
@@ -24,7 +22,7 @@ public class Main {
         feedTimer.cancel();
         feedTimer = new Timer();
         feedTimer.scheduleAtFixedRate(new TimerTask() { public void run() {
-            sendToAllWsClients(createHtmlMessage(RandomSentence.get()));
+            sendToAllWsClients(createRandomMessage());
         }}, 0, interval); //0 delay
     }
 
@@ -38,11 +36,11 @@ public class Main {
         });
     }
 
-    private static String createHtmlMessage(String text) {
+    private static String createRandomMessage() {
         return article().with(
-                h1(new SimpleDateFormat("HH:mm:ss (dd. MMM, yyyy)").format(new Date())),
+                h1("Message #" + numberOfMessagesSent++),
                 h2("Sent to " + feedSessions.size() + " clients").withClass("client-count"),
-                p(text)
+                p(RandomSentence.get())
         ).render();
     }
 
