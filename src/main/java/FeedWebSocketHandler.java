@@ -6,13 +6,13 @@ public class FeedWebSocketHandler {
 
     @OnWebSocketConnect
     public void onConnect(Session session) throws Exception {
-        System.out.println(session.getRemoteAddress() + " connected");
+        System.out.println("Client on port " + session.getRemoteAddress().getPort() + " connected");
         Main.feedSessions.add(session);
     }
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
-        System.out.println(session.getRemoteAddress() + " disconnected");
+        System.out.println("Client on port " + session.getRemoteAddress().getPort() + " disconnected");
         Main.feedSessions.remove(session);
     }
 
