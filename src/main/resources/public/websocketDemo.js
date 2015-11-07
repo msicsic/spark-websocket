@@ -1,22 +1,24 @@
 var webSocket;
 
-start();
+document.getElementById("send").addEventListener("click", function() {
+    sendMessage(document.getElementById("message").value);
+});
 
-function stop() {
-    webSocket.close();
-}
+document.getElementById("message").addEventListener("keypress", function(e) {
+    if(e.keyCode === 13){ sendMessage(e.target.value); }
+});
 
-function start() {
-    if (isOpen(webSocket)) { return; }
+(function() {
     webSocket = new WebSocket("ws://"+location.hostname+":"+location.port+"/randomGeneratedFeed/");
-    webSocket.onopen    = function()    { addMsgToFeed("CLIENT: Ready. Waiting for messages."); };
-    webSocket.onmessage = function(msg) { addMsgToFeed(msg);                                    };
-    webSocket.onclose   = function()    { addMsgToFeed("CLIENT: Connection closed.");           };
-}
+    webSocket.onopen    = function()    { addMsgToFeed("Connected");    };
+    webSocket.onmessage = function(msg) { addMsgToFeed(msg);            };
+    webSocket.onclose   = function()    { addMsgToFeed("Disconnected"); };
+})();
 
-function setSpeed(speed) {
-    if (isOpen(webSocket)) {
-        webSocket.send(speed);
+function sendMessage(message) {
+    if(isOpen(webSocket) && message !== "") {
+        document.getElementById("message").value = "";
+        webSocket.send(message);
     }
 }
 
@@ -27,8 +29,4 @@ function isOpen(ws) {
 function addMsgToFeed(msg) {
     var message = msg.data ? msg.data : "<article>" + msg + "</article>";
     document.getElementById("feed").insertAdjacentHTML("afterbegin", message);
-}
-
-function clearFeed() {
-    document.getElementById("feed").innerHTML = "";
 }

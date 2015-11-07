@@ -5,22 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>WebsSockets</title>
     <style>
+        *{box-sizing:border-box;}
         html{overflow-y:scroll;} #feed .client-count{position:absolute;top:10px;right:10px;font-size:12px;}
         body{font-family:monospace;font-size:14px;max-width:480px;margin:0 auto;padding:20px}
-        #buttons{display:flex;justify-content:space-between;margin:0 0 20px 0;}button{width:18%}
-        h1,h2,p{margin:5px 0;font-weight:300}h1{font-size:16px;}
+        input{width:100%;padding:5px;margin:5px 0;}button{float:right;}#chatControls{overflow:auto;margin:0 0 5px 0}
+        h1,h2,pre{margin:5px 0;font-weight:300}h1{font-size:16px;}
         #feed article{background:#eaeaea;padding:10px;margin:10px 0;border-left:5px solid #999;position:relative;}
         #feed article:first-of-type{background:#c9edc3;border-left-color:#74a377;animation:enter .2s 1;}
         @keyframes enter{from{transform:none;}50%{transform:scale(1.05);}to{transform:none;}}
     </style>
 </head>
 <body>
-    <div id="buttons">
-        <button onclick="stop()">Stop</button>
-        <button onclick="start()">Start</button>
-        <button onclick="setSpeed('SLOW')">Slow</button>
-        <button onclick="setSpeed('FAST')">Fast</button>
-        <button onclick="clearFeed()">Clear</button>
+    <div id="chatControls">
+        <input id="message" placeholder="Type your message">
+        <button id="send">Send</button>
     </div>
     <div id="feed"></div>
     <script src="/websocketDemo.js"></script>
