@@ -4,21 +4,16 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 @WebSocket
 public class FeedWebSocketHandler {
 
-    private Session session;
-
     @OnWebSocketConnect
     public void onConnect(Session session) throws Exception {
-        System.out.println(session.getRemoteAddress().toString() + " connected");
-        this.session = session;
-        Main.feedSessions.add(this.session);
+        System.out.println(session.getRemoteAddress() + " connected");
+        Main.feedSessions.add(session);
     }
 
     @OnWebSocketClose
-    public void onClose(int statusCode, String reason) {
-        System.out.println(session.getRemoteAddress().toString() + " disconnected");
-        this.session = Main.feedSessions.get(Main.feedSessions.size()-1);
-        Main.feedSessions.remove(this.session);
-        this.session.close();
+    public void onClose(Session session, int statusCode, String reason) {
+        System.out.println(session.getRemoteAddress() + " disconnected");
+        Main.feedSessions.remove(session);
     }
 
     @OnWebSocketMessage

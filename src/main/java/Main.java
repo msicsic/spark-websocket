@@ -3,7 +3,6 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import static j2html.TagCreator.*;
-import static java.util.Collections.synchronizedList;
 import static spark.Spark.*;
 
 public class Main {
@@ -13,7 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
         feedTimer = new Timer();
-        feedSessions = synchronizedList(new ArrayList<>());
+        feedSessions = new ArrayList<>();
         setTimerSpeed(2500);
         staticFileLocation("public"); // index.html will be served at localhost:4567/
         port(9999);
@@ -30,7 +29,6 @@ public class Main {
     }
 
     private static void sendToAllWsClients(String string) {
-        System.out.println("Sending to " + feedSessions.size());
         Main.feedSessions.stream().filter(Session::isOpen).forEach(s -> {
             try{
                 s.getRemote().sendString(string);
