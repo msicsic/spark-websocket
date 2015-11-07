@@ -2,7 +2,7 @@ import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 
 @WebSocket
-public class FeedListener {
+public class FeedWebSocketHandler {
 
     private Session session;
 

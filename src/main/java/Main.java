@@ -7,44 +7,48 @@ import static spark.Spark.*;
 
 public class Main {
 
-    static Timer feedTimer = new Timer();
-    static List<Session> wsSessions = new ArrayList<>();
+    static Timer feedTimer;
+    static List<Session> wsSessions;
 
     public static void main(String[] args) {
+        feedTimer = new Timer();
+        wsSessions = Collections.synchronizedList(new ArrayList<>());
         setTimerSpeed(2500);
         staticFileLocation("public"); // index.html will be served at localhost:4567/
         port(9999);
-        webSocket("/randomGeneratedFeed", FeedListener.class);
+        webSocket("/randomGeneratedFeed", FeedWebSocketHandler.class);
         init();
     }
 
     public static void setTimerSpeed(int intervalInMillis) {
         feedTimer.cancel();
         feedTimer = new Timer();
-        feedTimer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                send(createHtmlMessage(RandomSentence.get()));
-            }
-        }, intervalInMillis, intervalInMillis); //delay, interval
+        feedTimer.scheduleAtFixedRate(createTimerTask(), intervalInMillis, intervalInMillis); //delay, interval
     }
 
-    private static void send(String string) {
-        try {
-            for(Session session : Main.wsSessions) {
-                if(session.isOpen()) {
-                    session.getRemote().sendString(string);
-                }
+
+    private static TimerTask createTimerTask() {
+        return new TimerTask() {
+            public void run() {
+                sendToAllWsClients(createHtmlMessage(RandomSentence.get()));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        };
+    }
+
+    private static void sendToAllWsClients(String string) {
+        Main.wsSessions.stream().filter(Session::isOpen).forEach(s -> {
+            try{
+                s.getRemote().sendString(string);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private static String createHtmlMessage(String text) {
         return div().with(
-                text(new SimpleDateFormat("HH:mm:ss (dd. MMM, yyyy)").format(new Date())),
-                br(),
-                text(text)
+                h1(new SimpleDateFormat("HH:mm:ss (dd. MMM, yyyy)").format(new Date())),
+                p(text)
         ).render();
     }
 
