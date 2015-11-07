@@ -39,9 +39,9 @@ public class Main {
     }
 
     private static String createHtmlMessage(String text) {
-        return div().with(
+        return article().with(
                 h1(new SimpleDateFormat("HH:mm:ss (dd. MMM, yyyy)").format(new Date())),
-                h1("Sent to " + feedSessions.size() + " clients").withClass("client-count"),
+                h2("Sent to " + feedSessions.size() + " clients").withClass("client-count"),
                 p(text)
         ).render();
     }

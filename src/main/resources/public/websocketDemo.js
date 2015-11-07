@@ -25,7 +25,7 @@ function isOpen(ws) {
 }
 
 function addMsgToFeed(msg) {
-    var message = msg.data ? msg.data : "<div>" + msg + "</div>";
+    var message = msg.data ? msg.data : "<article>" + msg + "</article>";
     document.getElementById("feed").insertAdjacentHTML("afterbegin", message);
 }
 
