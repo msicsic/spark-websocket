@@ -10,7 +10,8 @@ function start() {
     if(isOpen(ws)) {
         return addMsgToFeed("CLIENT: Connection already open.")
     }
-    ws = new WebSocket("ws://localhost:4567/randomGeneratedFeed/");
+    var hostAndPort = location.hostname +":"+ location.port;
+    ws = new WebSocket("ws://"+hostAndPort+"/randomGeneratedFeed/");
     ws.onopen = function() {
         addMsgToFeed("CLIENT: Ready. Waiting for messages.")
     };
@@ -34,14 +35,14 @@ function isOpen(ws) {
 //DOM methods
 
 function addMsgToFeed(msg) {
-    var feed = document.getElementById("feed");
-    var messageDate = new Date().toLocaleTimeString();
-    var messageText =  typeof msg.data !== "undefined" ? msg.data : msg;
-    var message = document.createElement("div");
-    message.innerHTML = messageDate + "<br>" + messageText;
-    feed.insertBefore(message, feed.firstChild);
+    var message = msg.data ? msg.data : "<div>"+msg+"</div>";
+    id("feed").insertAdjacentHTML("afterbegin", message);
 }
 
 function clearFeed() {
-    document.getElementById("feed").innerHTML = "";
+    id("feed").innerHTML = "";
+}
+
+function id(id) {
+    return document.getElementById(id);
 }
