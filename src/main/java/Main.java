@@ -30,6 +30,7 @@ public class Main {
     }
 
     private static void sendToAllWsClients(String string) {
+        System.out.println("Sending to " + feedSessions.size());
         Main.feedSessions.stream().filter(Session::isOpen).forEach(s -> {
             try{
                 s.getRemote().sendString(string);

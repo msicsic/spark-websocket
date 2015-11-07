@@ -16,8 +16,9 @@ public class FeedWebSocketHandler {
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
         System.out.println(session.getRemoteAddress().toString() + " disconnected");
+        this.session = Main.feedSessions.get(Main.feedSessions.size()-1);
         Main.feedSessions.remove(this.session);
-        this.session = null;
+        this.session.close();
     }
 
     @OnWebSocketMessage
