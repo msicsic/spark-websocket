@@ -1,48 +1,34 @@
-var ws; //websocket
+var webSocket;
 
 start();
 
 function stop() {
-    ws.close();
+    webSocket.close();
 }
 
 function start() {
-    if(isOpen(ws)) {
-        return addMsgToFeed("CLIENT: Connection already open.")
-    }
-    var hostAndPort = location.hostname +":"+ location.port;
-    ws = new WebSocket("ws://"+hostAndPort+"/randomGeneratedFeed/");
-    ws.onopen = function() {
-        addMsgToFeed("CLIENT: Ready. Waiting for messages.")
-    };
-    ws.onmessage = function(msg) {
-        addMsgToFeed(msg);
-    };
-    ws.onclose = function() {
-        addMsgToFeed("CLIENT: Connection closed.");
-    };
+    if (isOpen(webSocket)) { return; }
+    webSocket = new WebSocket("ws://"+location.hostname+":"+location.port+"/randomGeneratedFeed/");
+    webSocket.onopen    = function()    { addMsgToFeed("CLIENT: Ready. Waiting for messages."); };
+    webSocket.onmessage = function(msg) { addMsgToFeed(msg);                                    };
+    webSocket.onclose   = function()    { addMsgToFeed("CLIENT: Connection closed.");           };
 }
 
 function setSpeed(speed) {
-    if(!isOpen(ws)) { return addMsgToFeed("CLIENT: Connection is closed. Can't change speed."); }
-    ws.send(speed);
+    if (isOpen(webSocket)) {
+        webSocket.send(speed);
+    }
 }
 
 function isOpen(ws) {
-    return typeof ws !== "undefined" && ws.readyState === ws.OPEN ;
+    return typeof ws !== "undefined" && ws.readyState === ws.OPEN;
 }
 
-//DOM methods
-
 function addMsgToFeed(msg) {
-    var message = msg.data ? msg.data : "<div>"+msg+"</div>";
-    id("feed").insertAdjacentHTML("afterbegin", message);
+    var message = msg.data ? msg.data : "<div>" + msg + "</div>";
+    document.getElementById("feed").insertAdjacentHTML("afterbegin", message);
 }
 
 function clearFeed() {
-    id("feed").innerHTML = "";
-}
-
-function id(id) {
-    return document.getElementById(id);
+    document.getElementById("feed").innerHTML = "";
 }
