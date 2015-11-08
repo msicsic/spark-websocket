@@ -13,7 +13,6 @@ public class Main {
     static int usernamesGenerated;
 
     public static void main(String[] args) {
-        port(9999);
         staticFileLocation("public"); // index.html will be served at localhost:4567 (default port)
         webSocket("/chat", ChatWebSocketHandler.class);
         init();
@@ -23,11 +22,10 @@ public class Main {
     public static void sendToAll(Session user, String string) {
         currentUsers.stream().filter(Session::isOpen).forEach(session -> {
             try {
-                session.getRemote().sendString(new JSONObject()
+                session.getRemote().sendString(String.valueOf(new JSONObject()
                     .put("userMessage", createHtmlMessage(user, string)) //The message wrapped in HTML
-                    .put("userlist", currentUsers.stream().map(Main::getUsername).collect(Collectors.toList())) //List of usernames
-                    .toString()
-                );
+                    .put("userlist", currentUsers.stream().map(Main::getUsername).collect(Collectors.toList()))
+                ));
             } catch (Exception e) {
                 e.printStackTrace();
             }
