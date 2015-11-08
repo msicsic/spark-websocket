@@ -13,7 +13,6 @@ public class Main {
     static int usernamesGenerated;
 
     public static void main(String[] args) {
-        port(9999);
         staticFileLocation("public"); // index.html will be served at localhost:4567 (default port)
         webSocket("/chat", ChatWebSocketHandler.class);
         init();
