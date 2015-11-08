@@ -32,7 +32,7 @@ public class Main {
         });
     }
 
-    //Builds a HTML element with username and message and  timestamp,
+    //Builds a HTML element with username, message and timestamp,
     private static String createHtmlMessage(Session msgSource, String message) {
         return article().with(
                 b(getUsername(msgSource) + " says:"),
