@@ -5,20 +5,20 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 public class ChatWebSocketHandler {
 
     @OnWebSocketConnect
-    public void onConnect(Session user) throws Exception {
-        Main.currentUsers.add(user);
-        Main.sendToAll(user, "I have arrived!");
+    public void onConnect(Session currentUser) throws Exception {
+        Main.currentUsers.add(currentUser);
+        Main.sendToAll(currentUser, "I have arrived!");
     }
 
     @OnWebSocketClose
-    public void onClose(Session user, int statusCode, String reason) {
-        Main.currentUsers.remove(user);
-        Main.sendToAll(user, "I'm outta here!");
+    public void onClose(Session currentUser, int statusCode, String reason) {
+        Main.currentUsers.remove(currentUser);
+        Main.sendToAll(currentUser, "I'm outta here!");
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session user, String message) {
-        Main.sendToAll(user, message);
+    public void onMessage(Session currentUser, String message) {
+        Main.sendToAll(currentUser, message);
     }
 
 }

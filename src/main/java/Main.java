@@ -19,11 +19,11 @@ public class Main {
     }
 
     //Sends a message from one user to all users, along with a list of current users
-    public static void sendToAll(Session user, String string) {
+    public static void sendToAll(Session msgSource, String message) {
         currentUsers.stream().filter(Session::isOpen).forEach(session -> {
             try {
                 session.getRemote().sendString(String.valueOf(new JSONObject()
-                    .put("userMessage", createHtmlMessage(user, string)) //The message wrapped in HTML
+                    .put("userMessage", createHtmlMessage(msgSource, message)) //The message wrapped in HTML
                     .put("userlist", currentUsers.stream().map(Main::getUsername).collect(Collectors.toList()))
                 ));
             } catch (Exception e) {
@@ -32,11 +32,11 @@ public class Main {
         });
     }
 
-    //Builds a HTML element with timestamp, username and message
-    private static String createHtmlMessage(Session user, String string) {
+    //Builds a HTML element with username and message and  timestamp,
+    private static String createHtmlMessage(Session msgSource, String message) {
         return article().with(
-                b(getUsername(user) + " says:"),
-                p(string),
+                b(getUsername(msgSource) + " says:"),
+                p(message),
                 span().withClass("timestamp").withText(new SimpleDateFormat("HH:mm:ss").format(new Date()))
         ).render();
     }
