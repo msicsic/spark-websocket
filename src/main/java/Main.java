@@ -34,7 +34,7 @@ public class Main {
         return article().with(
                 h1(new SimpleDateFormat("HH:mm:ss (dd. MMM, yyyy)").format(new Date())),
                 h2("Sent to " + currentUsers.size() + " clients").withClass("client-count"),
-                p().with(b(getUsername(session)), text(" says \"" + string + "\""))
+                p().with(b(getUsername(session)), text(" says '" + string + "'"))
         ).render();
     }
 

@@ -1,5 +1,6 @@
 var webSocket = new WebSocket("ws://"+location.hostname+":"+location.port+"/chat/");
 webSocket.onmessage = function(msg) { updateChat(msg); };
+webSocket.onclose = function(){alert("WebSocket connection closed")};
 
 id("send").addEventListener("click", function() {
     sendMessage(id("message").value);
