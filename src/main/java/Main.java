@@ -1,47 +1,52 @@
 import org.eclipse.jetty.websocket.api.*;
-import java.io.*;
+import org.json.*;
+import java.text.*;
 import java.util.*;
+import java.util.stream.*;
 import static j2html.TagCreator.*;
 import static spark.Spark.*;
 
 public class Main {
 
-    static Timer feedTimer = new Timer();
-    static List<Session> feedSessions = new ArrayList<>();
-    static int numberOfMessagesSent = 0;
+    static List<Session> currentUsers = new ArrayList<>();
+    static Map<Session, String> usernameList = new HashMap<>();
+    static int usernamesGenerated;
 
     public static void main(String[] args) {
-        setTimerSpeed(2500);
-        staticFileLocation("public"); // index.html will be served at localhost:4567/
-        port(9999);
-        webSocket("/randomGeneratedFeed", FeedWebSocketHandler.class);
+        staticFileLocation("public"); // index.html will be served at localhost:4567 (default port)
+        webSocket("/chat", ChatWebSocketHandler.class);
         init();
     }
 
-    public static void setTimerSpeed(int interval) {
-        feedTimer.cancel();
-        feedTimer = new Timer();
-        feedTimer.scheduleAtFixedRate(new TimerTask() { public void run() {
-            sendToAllWsClients(createRandomMessage());
-        }}, 0, interval); //0 delay
-    }
-
-    private static void sendToAllWsClients(String string) {
-        Main.feedSessions.stream().filter(Session::isOpen).forEach(s -> {
-            try{
-                s.getRemote().sendString(string);
-            } catch (IOException e) {
+    //Sends a message from one user to all users, along with a list of current users
+    public static void sendToAll(Session msgSource, String message) {
+        currentUsers.stream().filter(Session::isOpen).forEach(session -> {
+            try {
+                session.getRemote().sendString(String.valueOf(new JSONObject()
+                    .put("userMessage", createHtmlMessage(msgSource, message)) //The message wrapped in HTML
+                    .put("userlist", currentUsers.stream().map(Main::getUsername).collect(Collectors.toList()))
+                ));
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
-    private static String createRandomMessage() {
+    //Builds a HTML element with username and message and  timestamp,
+    private static String createHtmlMessage(Session msgSource, String message) {
         return article().with(
-                h1("Message #" + numberOfMessagesSent++),
-                h2("Sent to " + feedSessions.size() + " clients").withClass("client-count"),
-                p(RandomSentence.get())
+                b(getUsername(msgSource) + " says:"),
+                p(message),
+                span().withClass("timestamp").withText(new SimpleDateFormat("HH:mm:ss").format(new Date()))
         ).render();
+    }
+
+    //Create and return username for session
+    public static String getUsername(Session user) {
+        if(usernameList.get(user) == null) {
+            usernameList.put(user, "User" + (++usernamesGenerated)); //Pre-increment username
+        }
+        return usernameList.get(user);
     }
 
 }
