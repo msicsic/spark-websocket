@@ -9,10 +9,11 @@ import static spark.Spark.*;
 public class Main {
 
     static List<Session> currentUsers = new ArrayList<>();
-    static Map<Session, String> usernameList = new HashMap<>();
+    static Map<Session, String> usernameMap = new HashMap<>();
     static int usernamesGenerated;
 
     public static void main(String[] args) {
+        port(9999);
         staticFileLocation("public"); // index.html will be served at localhost:4567 (default port)
         webSocket("/chat", ChatWebSocketHandler.class);
         init();
@@ -43,10 +44,10 @@ public class Main {
 
     //Create and return username for session
     public static String getUsername(Session user) {
-        if(usernameList.get(user) == null) {
-            usernameList.put(user, "User" + (++usernamesGenerated)); //Pre-increment username
+        if(usernameMap.get(user) == null) {
+            usernameMap.put(user, "User" + (++usernamesGenerated)); //Pre-increment username
         }
-        return usernameList.get(user);
+        return usernameMap.get(user);
     }
 
 }
