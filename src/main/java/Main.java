@@ -8,7 +8,9 @@ import static spark.Spark.*;
 
 public class Main {
 
-    static List<Session> currentUsers = new ArrayList<>(); //Directly available to ChatWebSocketHandler
+    static List<Session> currentUsers = new ArrayList<>();
+    static Map<Session, String> usernameList = new HashMap<>();
+    static int usernamesGenerated;
 
     public static void main(String[] args) {
         port(9999);
@@ -21,10 +23,11 @@ public class Main {
     public static void sendToAll(Session user, String string) {
         currentUsers.stream().filter(Session::isOpen).forEach(session -> {
             try {
-                JSONObject json = new JSONObject();
-                json.put("userMessage", createHtmlMessage(user, string)); //The message wrapped in HTML
-                json.put("userlist", currentUsers.stream().map(Main::getUsername).collect(Collectors.toList())); //List of usernames
-                session.getRemote().sendString(json.toString());
+                session.getRemote().sendString(new JSONObject()
+                    .put("userMessage", createHtmlMessage(user, string)) //The message wrapped in HTML
+                    .put("userlist", currentUsers.stream().map(Main::getUsername).collect(Collectors.toList())) //List of usernames
+                    .toString()
+                );
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -40,9 +43,12 @@ public class Main {
         ).render();
     }
 
-    //Creates a username based on the session port
+    //Create and return username for session
     public static String getUsername(Session user) {
-        return "User " + user.getRemoteAddress().getPort();
+        if(usernameList.get(user) == null) {
+            usernameList.put(user, "User" + (++usernamesGenerated)); //Pre-increment username
+        }
+        return usernameList.get(user);
     }
 
 }
