@@ -1,7 +1,8 @@
 import org.eclipse.jetty.websocket.api.*;
-import java.io.*;
+import org.json.*;
 import java.text.*;
 import java.util.*;
+import java.util.stream.*;
 import static j2html.TagCreator.*;
 import static spark.Spark.*;
 
@@ -16,22 +17,29 @@ public class Main {
         init();
     }
 
-    public static void sendToAllWsClients(String string) {
+    public static void sendToAll(Session session, String string) {
         Main.currentUsers.stream().filter(Session::isOpen).forEach(s -> {
             try{
-                s.getRemote().sendString(createHtmlMessage(string));
-            } catch (IOException e) {
+                JSONObject json = new JSONObject();
+                json.put("message", createHtmlMessage(session, string));
+                json.put("userlist", Main.currentUsers.stream().map(Main::getUsername).collect(Collectors.toList()));
+                s.getRemote().sendString(json.toString());
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
-    private static String createHtmlMessage(String string) {
+    private static String createHtmlMessage(Session session, String string) {
         return article().with(
                 h1(new SimpleDateFormat("HH:mm:ss (dd. MMM, yyyy)").format(new Date())),
                 h2("Sent to " + currentUsers.size() + " clients").withClass("client-count"),
-                pre().with(text(string))
+                p().with(b(getUsername(session)), text(" says \"" + string + "\""))
         ).render();
+    }
+
+    public static String getUsername(Session session) {
+        return "User_" + session.getRemoteAddress().getPort();
     }
 
 }

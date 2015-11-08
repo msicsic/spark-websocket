@@ -1,32 +1,34 @@
-var webSocket;
+var webSocket = new WebSocket("ws://"+location.hostname+":"+location.port+"/chat/");
+webSocket.onmessage = function(msg) { updateChat(msg); };
 
-document.getElementById("send").addEventListener("click", function() {
-    sendMessage(document.getElementById("message").value);
+id("send").addEventListener("click", function() {
+    sendMessage(id("message").value);
 });
 
-document.getElementById("message").addEventListener("keypress", function(e) {
+id("message").addEventListener("keypress", function(e) {
     if(e.keyCode === 13){ sendMessage(e.target.value); }
 });
 
-(function() {
-    webSocket = new WebSocket("ws://"+location.hostname+":"+location.port+"/chat/");
-    webSocket.onopen    = function()    { addMsgToFeed("Connected");    };
-    webSocket.onmessage = function(msg) { addMsgToFeed(msg);            };
-    webSocket.onclose   = function()    { addMsgToFeed("Disconnected"); };
-})();
-
 function sendMessage(message) {
-    if(isOpen(webSocket) && message !== "") {
-        document.getElementById("message").value = "";
+    if(message !== "") {
+        id("message").value = "";
         webSocket.send(message);
     }
 }
 
-function isOpen(ws) {
-    return typeof ws !== "undefined" && ws.readyState === ws.OPEN;
+function updateChat(msg) {
+    var data = JSON.parse(msg.data);
+    insert("feed", data.message);
+    id("userlist").innerHTML = "";
+    data.userlist.forEach(function (user) {
+        insert("userlist", "<li>" + user + "</li>");
+    });
 }
 
-function addMsgToFeed(msg) {
-    var message = msg.data ? msg.data : "<article>" + msg + "</article>";
-    document.getElementById("feed").insertAdjacentHTML("afterbegin", message);
+function insert(targetId, message) {
+    id(targetId).insertAdjacentHTML("afterbegin", message);
+}
+
+function id(id) {
+    return document.getElementById(id);
 }
