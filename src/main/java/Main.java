@@ -8,37 +8,41 @@ import static spark.Spark.*;
 
 public class Main {
 
-    static List<Session> currentUsers = new ArrayList<>();
+    static List<Session> currentUsers = new ArrayList<>(); //Directly available to ChatWebSocketHandler
 
     public static void main(String[] args) {
-        staticFileLocation("public"); // index.html will be served at localhost:4567/
-        port(4567);
+        port(9999);
+        staticFileLocation("public"); // index.html will be served at localhost:4567 (default port)
         webSocket("/chat", ChatWebSocketHandler.class);
         init();
     }
 
-    public static void sendToAll(Session session, String string) {
-        Main.currentUsers.stream().filter(Session::isOpen).forEach(s -> {
-            try{
+    //Sends a message from one user to all users, along with a list of current users
+    public static void sendToAll(Session user, String string) {
+        currentUsers.stream().filter(Session::isOpen).forEach(session -> {
+            try {
                 JSONObject json = new JSONObject();
-                json.put("message", createHtmlMessage(session, string));
-                json.put("userlist", Main.currentUsers.stream().map(Main::getUsername).collect(Collectors.toList()));
-                s.getRemote().sendString(json.toString());
+                json.put("userMessage", createHtmlMessage(user, string)); //The message wrapped in HTML
+                json.put("userlist", currentUsers.stream().map(Main::getUsername).collect(Collectors.toList())); //List of usernames
+                session.getRemote().sendString(json.toString());
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
-    private static String createHtmlMessage(Session session, String string) {
+    //Builds a HTML element with timestamp, username and message
+    private static String createHtmlMessage(Session user, String string) {
         return article().with(
-                h1(new SimpleDateFormat("HH:mm:ss (dd. MMM, yyyy)").format(new Date())),
-                p().with(b(getUsername(session)), text(" says '" + string + "'"))
+                b(getUsername(user) + " says:"),
+                p(string),
+                span().withClass("timestamp").withText(new SimpleDateFormat("HH:mm:ss").format(new Date()))
         ).render();
     }
 
-    public static String getUsername(Session session) {
-        return "User_" + session.getRemoteAddress().getPort();
+    //Creates a username based on the session port
+    public static String getUsername(Session user) {
+        return "User " + user.getRemoteAddress().getPort();
     }
 
 }
