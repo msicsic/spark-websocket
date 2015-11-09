@@ -11,7 +11,7 @@ public class Main {
     static int nextUserNumber = 1; //Assign to username for next connecting user
 
     public static void main(String[] args) {
-        staticFileLocation("public"); //index.html will be served at localhost:4567 (default port)
+        staticFileLocation("public"); //index.html is served at localhost:4567 (default port)
         webSocket("/chat", ChatWebSocketHandler.class);
         init();
     }
@@ -21,7 +21,7 @@ public class Main {
         userUsernameMap.keySet().stream().filter(Session::isOpen).forEach(session -> {
             try {
                 session.getRemote().sendString(String.valueOf(new JSONObject()
-                    .put("userMessage", createHtmlMessageFromUser(sender, message))
+                    .put("userMessage", createHtmlMessageFromSender(sender, message))
                     .put("userlist", userUsernameMap.values())
                 ));
             } catch (Exception e) {
@@ -30,8 +30,8 @@ public class Main {
         });
     }
 
-    //Builds a HTML element with username, message and timestamp,
-    private static String createHtmlMessageFromUser(String sender, String message) {
+    //Builds a HTML element with a sender-name, a message, and a timestamp,
+    private static String createHtmlMessageFromSender(String sender, String message) {
         return article().with(
                 b(sender + " says:"),
                 p(message),
