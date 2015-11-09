@@ -5,7 +5,7 @@ import java.util.*;
 import static j2html.TagCreator.*;
 import static spark.Spark.*;
 
-public class Main {
+public class Chat {
 
     static Map<Session, String> userUsernameMap = new HashMap<>();
     static int nextUserNumber = 1; //Assign to username for next connecting user
