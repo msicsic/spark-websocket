@@ -24,9 +24,8 @@ internal fun broadcastMessage(sender: String?, message: String) {
     }
 }
 
-internal fun createHtmlMessageFromSender(sender: String?, message: String) {
-    article().with(
-            b("$sender says:"),
-            p(message),
-            span().withClass("timestamp").withText(SimpleDateFormat("HH:mm:ss").format(Date()))).render()
-}
+internal fun createHtmlMessageFromSender(sender: String?, message: String): String =
+        article().with(
+                b("$sender says:"),
+                p(message),
+                span().withClass("timestamp").withText(SimpleDateFormat("HH:mm:ss").format(Date()))).render()
